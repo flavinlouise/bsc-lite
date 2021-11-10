@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  bsc:
+    build: .
+    image: bsc-lite
+    container_name: bsc-lite
+    restart: always
+    network_mode: host
+    environment:
+      NETWORK: main
+      #NETWORK: test
+    volumes:
+      #- ./data:/data
+      - /Volumes/Extreme SSD/bsc/data:/data
