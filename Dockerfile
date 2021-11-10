@@ -1,4 +1,4 @@
-FROM debian:10 as builder
+FROM debian:stable as builder
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get -q -y update && \
@@ -22,7 +22,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     cp /bsc/build/bin/geth /usr/bin/geth && \
     tar cvf /transfer.tar /usr/bin/geth /*.zip
 
-FROM debian:10
+FROM debian:stable
 
 ENV NETWORK=main
 COPY --from=builder /transfer.tar /transfer.tar
@@ -51,4 +51,12 @@ EXPOSE 8546/tcp
 # GraphQL API
 EXPOSE 8547/tcp
 
-CMD sh -xc "cd /data; [ ! -f '/data/genesis.json' ] && unzip /$NETWORK'net.zip' && geth --datadir . init genesis.json && sed -i '/^HTTP/d' ./config.toml; exec geth --config ./config.toml --datadir . --pprof --pprofaddr 0.0.0.0 --metrics --rpc --rpcapi eth,net,web3,txpool,parlia --rpccorsdomain '*' --rpcvhosts '*' --rpcaddr 0.0.0.0 --rpcport 8545 --ws --wsapi eth,net,web3 --wsorigins '*' --wsaddr 0.0.0.0 --wsport 8546 --graphql --graphql.addr 0.0.0.0 --graphql.port 8587 --graphql.corsdomain '*' --graphql.vhosts '*'"
+
+CMD sh -xc "cd /data; [ ! -f '/data/genesis.json' ] && unzip /$NETWORK'net.zip' && \
+ geth --datadir . init genesis.json && sed -i '/^HTTP/d' ./config.toml; \
+ exec geth --config ./config.toml --datadir .  --ipcpath /node/geth.ipc  --diffsync  \
+ --pprof --pprof.addr 0.0.0.0 --metrics \
+ --http --http.api eth,net,web3,txpool,parlia --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.vhosts '*' \
+ --ws --ws.api eth,net,web3 --ws.origins '*' --ws.addr 0.0.0.0 --ws.port 8546 \
+ --graphql --graphql.corsdomain '*' --graphql.vhosts '*' \
+ --cache 8000 --rpc.allow-unprotected-txs  --txlookuplimit 0 "
