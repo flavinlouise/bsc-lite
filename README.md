@@ -2,6 +2,8 @@
 
 Binance Smart Chain Fullnode.
 
+based on 
+
 ## Changelogs
 
 
@@ -12,6 +14,15 @@ This is a Binance Smart Chain Fullnode Container running on `_/debian`.
 For more see: https://docs.binance.org/smart-chain/developer/fullnode.html
 
 ## Environment variables and defaults
+
+### notice
+
+* --ipcpath /node/geth.ipc    
+ipc path must not within external SSD if MacOS
+* --diffsync new mode in geth 1.13
+
+
+For more see: https://geth.ethereum.org/docs/interface/command-line-options
 
 ### Samba
 
@@ -35,8 +46,6 @@ For more see: https://docs.binance.org/smart-chain/developer/fullnode.html
     * HTTP based JSON RPC API
 * 8546 `tcp`
     * WebSocket based JSON RPC API
-* 8547 `tcp`
-    * GraphQL API
 * 30311 `udp` `tcp`
     * Node P2P
 
@@ -47,7 +56,7 @@ version: '3'
  
 services:
   bsc:
-    image: servercontainers/bsc
+    image: xxx/bsc-lite
     restart: always
     environment:
       NETWORK: main
@@ -57,6 +66,5 @@ services:
       - "127.0.0.1:6060:6060"
       - "127.0.0.1:8545:8545"
       - "127.0.0.1:8546:8546"
-      - "127.0.0.1:8547:8547"
       - "30311:30311"
 ```

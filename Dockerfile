@@ -51,12 +51,13 @@ EXPOSE 8546/tcp
 # GraphQL API
 EXPOSE 8547/tcp
 
-
-CMD sh -xc "cd /data; [ ! -f '/data/genesis.json' ] && unzip /$NETWORK'net.zip' && \
- geth --datadir . init genesis.json && sed -i '/^HTTP/d' ./config.toml; \
- exec geth --config ./config.toml --datadir .  --ipcpath /node/geth.ipc  --diffsync  \
- --pprof --pprof.addr 0.0.0.0 --metrics \
- --http --http.api eth,net,web3,txpool,parlia --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.vhosts '*' \
- --ws --ws.api eth,net,web3 --ws.origins '*' --ws.addr 0.0.0.0 --ws.port 8546 \
+# start geth
+CMD sh -xc "cd /data;  \
+ [ ! -f '/data/genesis.json' ] && unzip /$NETWORK'net.zip' && geth --datadir . init genesis.json && sed -i '/^HTTP/d' ./config.toml; \
+ geth --config ./config.toml --datadir .  --ipcpath /node/geth.ipc  --diffsync  --fakepow  \
+ --http --http.api admin,debug,eth,net,web3,txpool,parlia --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.vhosts '*' \
+ --ws --ws.api eth,net,web3,txpool --ws.origins '*' --ws.addr 0.0.0.0 --ws.port 8546 \
  --graphql --graphql.corsdomain '*' --graphql.vhosts '*' \
- --cache 8000 --rpc.allow-unprotected-txs  --txlookuplimit 0 "
+ --pprof --pprof.addr 0.0.0.0 --metrics  --verbosity 5 --log.debug  \
+ --cache 8000  --cache.database 40  --cache.trie 20 --cache.gc 10 \
+ --rpc.allow-unprotected-txs  --txlookuplimit 0 ;"

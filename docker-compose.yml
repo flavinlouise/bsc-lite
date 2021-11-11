@@ -2,14 +2,22 @@ version: '3'
 
 services:
   bsc:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: bsc-lite
     container_name: bsc-lite
     restart: always
-    network_mode: host
+    #network_mode: host
     environment:
       NETWORK: main
       #NETWORK: test
     volumes:
       #- ./data:/data
       - /Volumes/Extreme SSD/bsc/data:/data
+    ports:
+      - "6060:6060"
+      - "8545:8545"
+      - "8546:8546"
+      - "30311:30311"
+      - "30311:30311/udp"
